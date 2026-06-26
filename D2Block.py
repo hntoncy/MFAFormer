@@ -1,5 +1,5 @@
 from mynet.D2AFormer.D_Trans import *
-from mynet.CE.D_CNN import *
+from mynet.D2AFormer.D_CNN import *
 class D2Block(nn.Module):
     def __init__(self,in_channels,out_channels,img_size,emb_size=96 ):
         super().__init__()
