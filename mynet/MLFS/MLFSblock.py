@@ -1,4 +1,4 @@
-from ZJW.mynet.MSSBlock.biformer import Block
+from mynet.MLFS.biformer import Block
 import torch
 import torchvision.transforms as transforms
 from PIL import Image
@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import torch.nn as nn
 
 
-class MSS_Merge_layer(nn.Module):
+class MLFS_Merge_layer(nn.Module):
     def __init__(self):
         super().__init__()
         # 定义三个卷积层
@@ -55,7 +55,7 @@ class MSS_Merge_layer(nn.Module):
         return Y
 
 
-class MSS_stage2(nn.Module):
+class MLFS_stage2(nn.Module):
     def __init__(self, in_channels=128, out_channels=256, drop_path=0., layer_scale_init_value=-1,
                 num_heads=8, n_win=4, qk_dim=None, qk_scale=None,
                 kv_per_win=4, kv_downsample_ratio=4, kv_downsample_kernel=None, kv_downsample_mode='ada_avgpool',
@@ -89,7 +89,7 @@ class MSS_stage2(nn.Module):
         out = out + x  # 残差连接
         out = self.relu(out)
         return out
-class MSS_stage3(nn.Module):
+class MLFS_stage3(nn.Module):
     def __init__(self, in_channels=256, out_channels=256, drop_path=0., layer_scale_init_value=-1,
                 num_heads=8, n_win=4, qk_dim=None, qk_scale=None,
                 kv_per_win=4, kv_downsample_ratio=4, kv_downsample_kernel=None, kv_downsample_mode='ada_avgpool',
@@ -122,7 +122,7 @@ class MSS_stage3(nn.Module):
         out = out + x  # 残差连接
         out = self.relu(out)
         return out
-class MSS_stage4(nn.Module):
+class MLFS_stage4(nn.Module):
     def __init__(self, in_channels=512, out_channels=256, drop_path=0., layer_scale_init_value=-1,
                 num_heads=8, n_win=4, qk_dim=None, qk_scale=None,
                 kv_per_win=4, kv_downsample_ratio=4, kv_downsample_kernel=None, kv_downsample_mode='ada_avgpool',
@@ -178,20 +178,20 @@ class Fusion(nn.Module):
         self.norm2 = nn.LayerNorm(dim, eps=1e-6)
         self.proj = nn.Linear(dim,dim)
         self.proj_drop = nn.Dropout(proj_drop)
-        self.Merge_layer = MSS_Merge_layer()
-        self.stage2 = MSS_stage2(128, 256, drop_path=drop_path, layer_scale_init_value=layer_scale_init_value,
+        self.Merge_layer = MLFS_Merge_layer()
+        self.stage2 = MLFS_stage2(128, 256, drop_path=drop_path, layer_scale_init_value=layer_scale_init_value,
                 num_heads=num_heads, n_win=n_win, qk_dim=qk_dim, qk_scale=qk_scale,
                 kv_per_win=kv_per_win, kv_downsample_ratio=kv_downsample_ratio, kv_downsample_kernel=kv_downsample_kernel, kv_downsample_mode=kv_downsample_mode,
                 topk=topk, param_attention=param_attention, param_routing=param_routing, diff_routing=diff_routing, soft_routing=soft_routing,
                 mlp_ratio=mlp_ratio, mlp_dwconv=mlp_dwconv,
                 side_dwconv=side_dwconv, before_attn_dwconv=before_attn_dwconv, pre_norm=pre_norm, auto_pad=auto_pad)
-        self.stage3 = MSS_stage3(256, 256, drop_path=drop_path, layer_scale_init_value=layer_scale_init_value,
+        self.stage3 = MLFS_stage3(256, 256, drop_path=drop_path, layer_scale_init_value=layer_scale_init_value,
                 num_heads=num_heads, n_win=n_win, qk_dim=qk_dim, qk_scale=qk_scale,
                 kv_per_win=kv_per_win, kv_downsample_ratio=kv_downsample_ratio, kv_downsample_kernel=kv_downsample_kernel, kv_downsample_mode=kv_downsample_mode,
                 topk=topk, param_attention=param_attention, param_routing=param_routing, diff_routing=diff_routing, soft_routing=soft_routing,
                 mlp_ratio=mlp_ratio, mlp_dwconv=mlp_dwconv,
                 side_dwconv=side_dwconv, before_attn_dwconv=before_attn_dwconv, pre_norm=pre_norm, auto_pad=auto_pad)
-        self.stage4 = MSS_stage4(512, 256, drop_path=drop_path, layer_scale_init_value=layer_scale_init_value,
+        self.stage4 = MLFS_stage4(512, 256, drop_path=drop_path, layer_scale_init_value=layer_scale_init_value,
                 num_heads=num_heads, n_win=n_win, qk_dim=qk_dim, qk_scale=qk_scale,
                 kv_per_win=kv_per_win, kv_downsample_ratio=kv_downsample_ratio, kv_downsample_kernel=kv_downsample_kernel, kv_downsample_mode=kv_downsample_mode,
                 topk=topk, param_attention=param_attention, param_routing=param_routing, diff_routing=diff_routing, soft_routing=soft_routing,
