@@ -1,9 +1,9 @@
 # import torch
 # import torch.nn as nn
 # import torch.nn.functional as F
-from ZJW.mynet.CE.CEBlock import *
-from ZJW.mynet.MSSBlock.MSS_res import *
-from ZJW.mynet.MAC.macblock import *
+from mynet.D2AFormer.D2Block import *
+from mynet.MLFS.MLFSblock import *
+from mynet.CFE.CFEblock import *
 class DoubleConv(nn.Module):
     """(convolution => [BN] => ReLU) * 2"""
 
@@ -43,9 +43,9 @@ class Up(nn.Module):
         #         self.up = nn.Upsample(scale_factor=2, mode='bilinear', align_corners=True)
         # else:
         self.up = nn.ConvTranspose2d(in_channels , in_channels//2 , kernel_size=2, stride=2)
-        self.ce = CEBlock(in_channels//2,out_channels,img_size)
-        self.mss = Fusion(dim)
-        self.mac = MacBlock(in_channels//2,out_channels,img_size)
+        self.d2 = D2Block(in_channels//2,out_channels,img_size)
+        self.mlfs = Fusion(dim)
+        self.cfe = CEEBlock(in_channels//2,out_channels,img_size)
         self.conv = nn.Conv2d(in_channels//2,in_channels//2,kernel_size=3,padding=1)
         self.up1 = nn.ConvTranspose2d(dim, dim // 2, kernel_size=2, stride=2)
         self.down1 = nn.MaxPool2d(2)
@@ -53,23 +53,23 @@ class Up(nn.Module):
 
     def forward(self, x1, x2,x3,x4,x5):#x1:上级解码器(y)//x2，x3，x4：第二三四级编码器(z)//x5：同级编码器(x)
         de=self.up(x1)
-        mss=self.mss(x2,x3,x4)
+        mlfs=self.mlfs(x2,x3,x4)
         # print("mss=",mss.shape)
         if x5.size(3) < 128:
-            mss = self.down1(mss)
-            mss = self.conv1(mss)
+            mlfs = self.down1(mlfs)
+            mlfs = self.conv1(mlfs)
         elif x5.size(3) > 128:
-            mss = self.up1(mss)
+            mlfs = self.up1(mlfs)
         # print("x5=",x5.shape)
-        # print("mss=",mss.shape)
-        skip=self.mac(x5,mss)
+        # print("mss=",mlfs.shape)
+        skip=self.mac(x5,mlfs)
         # diffY = torch.tensor([skip.size()[2] - de.size()[2]])
         # diffX = torch.tensor([skip.size()[3] - de.size()[3]])
         #
         # de = F.pad(de, [diffX // 2, diffX - diffX // 2,
         #                         diffY // 2, diffY - diffY // 2])
         # print("de=",de.shape)
-        out=self.ce(skip,de,mss)
+        out=self.d2(skip,de,mlfs)
         return self.conv(out)
 
 
