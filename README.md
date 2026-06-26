@@ -1,5 +1,5 @@
 # MFAFormer
-The official implementation of MFAFormer's code. https://doi.org/10.1016/j.asoc.2026.115792 
+The official code of MFAFormer. https://doi.org/10.1016/j.asoc.2026.115792 
 
 ## MFAFormer: Multi-scale feature enhancement with axial Transformer for medical image segmentation  
 
