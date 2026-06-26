@@ -11,29 +11,6 @@ from einops.layers.torch import Rearrange, Reduce
 # from torchsummary import summary
 import torch.utils.checkpoint as checkpoint
 
-# class PatchEmbedding(nn.Module):
-#     def __init__(self, in_channels = 3, patch_size = 16, emb_size = 96, img_size = 224):
-#         self.patch_size = patch_size
-#         super().__init__()
-#         self.projection = nn.Sequential(
-#             # 使用一个卷积层而不是一个线性层 -> 性能增加
-#             nn.Conv2d(in_channels, emb_size, kernel_size=patch_size, stride=patch_size),
-#             Rearrange('b e (h) (w) -> b (h w) e'),
-#         )
-#         # self.cls_token = nn.Parameter(torch.randn(1, 1, emb_size))
-#         # 位置编码信息，一共有(img_size // patch_size)**2 + 1(cls token)个位置向量
-#         self.positions = nn.Parameter(torch.randn((img_size // patch_size) ** 2 , emb_size))
-#
-#     def forward(self, x: Tensor) -> Tensor:
-#         b, _, _, _ = x.shape
-#         x = self.projection(x)
-#         # cls_tokens = repeat(self.cls_token, '() n e -> b n e', b=b)
-#         # 将cls token在维度1扩展到输入上
-#         # x = torch.cat([cls_tokens, x], dim=1)
-#         # 添加位置编码
-#         # print("x:",x.shape, "position:",self.positions.shape)
-#         x += self.positions
-#         return x
 class PatchEmbedding(nn.Module):
     def __init__(self, in_channels=3, patch_size=16, emb_size=96):
         super().__init__()
@@ -46,76 +23,6 @@ class PatchEmbedding(nn.Module):
         x = self.rearrange(x)  # B, N, E
         return x
 
-# class MultiHeadAttention(nn.Module):
-#     def __init__(self, emb_size= 768, num_heads = 8, dropout = 0):
-#         super().__init__()
-#         self.emb_size = emb_size
-#         self.num_heads = num_heads
-#         # 使用单个矩阵一次性计算出queries,keys,values
-#         self.qkv = nn.Linear(emb_size, emb_size * 3)
-#         self.att_drop = nn.Dropout(dropout)
-#         self.projection = nn.Linear(emb_size, emb_size)
-#         self.norm =  nn.LayerNorm(emb_size)
-#
-#     def forward(self, x1,x2,mask: Tensor = None) :
-#         # 将queries，keys和values划分为num_heads
-#         # print("1qkv's shape: ", self.qkv(x).shape)  # 使用单个矩阵一次性计算出queries,keys,values
-#         x1 = self.norm(x1)
-#         x2 = self.norm(x2)
-#         res1 = x1
-#         res2 = x2
-#         qkv_1 = rearrange(self.qkv(x1), "b n (h d qkv) -> (qkv) b h n d", h=self.num_heads, qkv=3)  # 划分到num_heads个头上
-#         qkv_2 = rearrange(self.qkv(x2), "b n (h d qkv) -> (qkv) b h n d", h=self.num_heads, qkv=3)
-#         # print("2qkv's shape: ", qkv.shape)
-#
-#         queries1, keys1, values1 = qkv_1[0], qkv_1[1], qkv_1[2]
-#         queries2, keys2, values2 = qkv_2[0], qkv_2[1], qkv_2[2]
-#         # print("queries's shape: ", queries.shape)
-#         # print("keys's shape: ", keys.shape)
-#         # print("values's shape: ", values.shape)
-#
-#         # 在最后一个维度上相加
-#         energy_1 = torch.einsum('bhqd, bhkd -> bhqk', queries1, keys1)  # batch, num_heads, query_len, key_len
-#         energy_2 = torch.einsum('bhqd, bhkd -> bhqk', queries2, keys2)
-#         # print("energy's shape: ", energy.shape)
-#         if mask is not None:
-#             fill_value = torch.finfo(torch.float32).min
-#             energy_1.mask_fill(~mask, fill_value)
-#
-#         scaling = self.emb_size ** (1 / 2)
-#         # print("scaling: ", scaling)
-#         att_1 = F.softmax(energy_1, dim=-1) / scaling
-#         att_2 = F.softmax(energy_2, dim=-1) / scaling
-#         # print("att1' shape: ", att.shape)
-#         att_1 = self.att_drop(att_1)
-#         att_2 = self.att_drop(att_2)
-#         # print("att2' shape: ", att.shape)
-#
-#         # 在第三个维度上相加
-#         out_1 = torch.einsum('bhal, bhlv -> bhav ', att_1, values2)
-#         out_2 = torch.einsum('bhal, bhlv -> bhav ', att_2, values1)
-# #-----------------------------融合机制-----------------------------
-#         # print("out1's shape: ", out.shape)
-#         out1 = rearrange(out_1, "b h n d -> b n (h d)")
-#         out2 = rearrange(out_2, "b h n d -> b n (h d)")
-#         out_1 = out1+res1
-#         out_2 = out2+res2
-#         out = out_1 + out_2
-#         # print("out2's shape: ", out.shape)
-#         out = self.projection(out)
-#         # print("out3's shape: ", out.shape)
-#         return out
-
-# class ResidualAdd(nn.Module):
-#     def __init__(self, fn):
-#         super().__init__()
-#         self.fn = fn
-#
-#     def forward(self, x, **kwargs):
-#         res = x
-#         x = self.fn(x, **kwargs)
-#         x += res
-#         return x
 class MultiHeadAttention(nn.Module):
     def __init__(self, emb_size=768, num_heads=8, dropout=0):
         super().__init__()
@@ -279,7 +186,7 @@ class PatchMerging(nn.Module):
 #                 nn.Dropout(drop_p)
 #             )
 #             ))
-#---------------------------后续恢复原图尺寸时查看书签中的transunet的最后整合阶段的rearrange(原文用的双线性插值上采样）-------------------------
+
 # x2 = torch.randn(1,512,64,64)
 # x1 = torch.randn(1,512,64,64)
 # net=Transblock(in_channels = 512, out_channels=512,patch_size = 4, emb_size = 768, img_size = 64,num_heads = 8,dropout=0,expansion=4)
