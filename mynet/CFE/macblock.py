@@ -1,9 +1,9 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from ZJW.mynet.MAC.chennelAttention import *
-from ZJW.mynet.MAC.RPN import *
-from ZJW.mynet.MAC.crossformer import *
+from mynet.CFE.chennelAttention import *
+from mynet.CFE.RPN import *
+from mynet.CFE.crossformer import *
 
 class MacBlock(nn.Module):
     def __init__(self, in_channels,out_channels,img_size,patch_size=8):
