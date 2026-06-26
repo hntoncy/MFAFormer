@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 # from ViT import *
-from ZJW.mynet.CE.CE_ViT import *
+from mynet.D2AFormer.D2_ViT import *
 class AveragePooling1xW(nn.Module):
     def __init__(self):
         super().__init__()
