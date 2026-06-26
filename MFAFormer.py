@@ -1,4 +1,4 @@
-from ZJW.mypart import *
+from part import *
 
 class UNet(nn.Module):
     def __init__(self, n_channels, n_classes):
