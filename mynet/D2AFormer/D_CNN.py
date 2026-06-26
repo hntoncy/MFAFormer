@@ -6,7 +6,7 @@ import torch.nn.functional as F
 # from biformer import Block
 import os
 # from skimage.metrics import structural_similarity as ssim
-from ZJW.mynet.CE.ssim2 import *
+from mynet.D2AFormer.ssim2 import *
 
 #-------------------------------------------------------------------------------------------------
 class fourconv(nn.Module):
