@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 from timm.models.layers import DropPath
 
-from mynet.MLFS.ops.bra_legacy import BiLevelRoutingAttention
+from mynet.MLFS.bra_legacy import BiLevelRoutingAttention
 
 from mynet.MLFS._common import DWConv
 def get_pe_layer(emb_dim, pe_dim=None, name='none'):
