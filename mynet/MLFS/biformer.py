@@ -2,9 +2,9 @@ import torch
 import torch.nn as nn
 from timm.models.layers import DropPath
 
-from ZJW.mynet.MSSBlock.ops.bra_legacy import BiLevelRoutingAttention
+from mynet.MLFS.ops.bra_legacy import BiLevelRoutingAttention
 
-from ZJW.mynet.MSSBlock._common import DWConv
+from mynet.MLFS._common import DWConv
 def get_pe_layer(emb_dim, pe_dim=None, name='none'):
     if name == 'none':
         return nn.Identity()
