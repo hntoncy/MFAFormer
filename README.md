@@ -23,7 +23,7 @@ The proposed CFE module.
 The proposed D2AFormer module.    
 
 # Citation:
-If you use or build upon this work, please cite the main paper:
+If our work is helpful to your research, please cite our paper following this.
 
 Dongxu Cheng, Jingwen Zhang, Qiwei Dong, Yan Yang, Yuhui Zheng. MFAFormer: Multi-scale feature enhancement with axial transformer for medical image segmentation[J]. Applied Soft Computing, 2026, 202: 115792.
 
